@@ -1,0 +1,10 @@
+{
+  "name": "Bunny Notes",
+  "short_name": "Bunny Notes",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fff7e7",
+  "theme_color": "#f6f0ff",
+  "description": "A touch-friendly Bunny Notes app for iPhone home screen use.",
+  "icons": []
+}

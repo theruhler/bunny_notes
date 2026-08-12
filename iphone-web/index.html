@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f6f0ff" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Bunny Notes" />
+    <title>Bunny Notes</title>
+    <link rel="apple-touch-icon" href="../bunny1.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="top-bar">
+        <h1>Bunny Notes</h1>
+        <div class="top-actions">
+          <button id="settingsBtn" class="btn secondary small">Settings</button>
+          <button id="installBtn" class="btn secondary small" hidden>Install</button>
+        </div>
+      </header>
+
+      <section class="card" aria-live="polite">
+        <img id="bunnyImage" src="../bunny1.png" alt="Bunny" />
+        <p id="messageText">Tap for a new note.</p>
+      </section>
+
+      <nav class="controls" aria-label="Controls">
+        <button id="prevBtn" class="btn">Previous</button>
+        <button id="nextBtn" class="btn">Next</button>
+        <button id="shuffleBunnyBtn" class="btn secondary">New Bunny</button>
+      </nav>
+
+      <p class="hint">Tip: Tap the bunny for a fresh note. Swipe left/right to browse.</p>
+    </main>
+
+    <section id="settingsModal" class="modal hidden" aria-hidden="true" role="dialog" aria-labelledby="settingsTitle">
+      <div class="modal-card">
+        <h2 id="settingsTitle">Settings</h2>
+
+        <label class="field" for="fontSizeInput">
+          <span>Font Size</span>
+          <input id="fontSizeInput" type="range" min="14" max="30" step="1" />
+        </label>
+
+        <label class="field checkbox" for="signatureToggle">
+          <input id="signatureToggle" type="checkbox" />
+          <span>Show signature (- Michael)</span>
+        </label>
+
+        <label class="field" for="themeSelect">
+          <span>Theme Color</span>
+          <select id="themeSelect">
+            <option value="sunset">Sunset</option>
+            <option value="mint">Mint</option>
+            <option value="sky">Sky</option>
+            <option value="rose">Rose</option>
+          </select>
+        </label>
+
+        <div class="modal-actions">
+          <button id="saveSettingsBtn" class="btn">Save</button>
+          <button id="changePinBtn" class="btn secondary">Set/Change PIN</button>
+          <button id="removePinBtn" class="btn secondary">Remove PIN</button>
+          <button id="closeSettingsBtn" class="btn secondary">Close</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="pinOverlay" class="overlay hidden" aria-hidden="true">
+      <div class="overlay-card">
+        <h2 id="pinTitle">Unlock Bunny Notes</h2>
+        <p id="pinHint">Enter your PIN to continue.</p>
+        <input id="pinInput" type="password" inputmode="numeric" pattern="[0-9]*" placeholder="PIN" autocomplete="off" />
+        <input id="pinConfirmInput" class="hidden" type="password" inputmode="numeric" pattern="[0-9]*" placeholder="Confirm PIN" autocomplete="off" />
+        <p id="pinError" class="error" aria-live="polite"></p>
+        <button id="pinSubmitBtn" class="btn">Unlock</button>
+      </div>
+    </section>
+
+    <script src="app.js"></script>
+  </body>
+</html>
