@@ -50,7 +50,7 @@
 
         <label class="field checkbox" for="signatureToggle">
           <input id="signatureToggle" type="checkbox" />
-          <span>Show signature (- Michael)</span>
+          <span id="signatureToggleLabel">Show signature</span>
         </label>
 
         <label class="field" for="themeSelect">
@@ -73,7 +73,19 @@
           <span>Tint the bunny with this color</span>
         </label>
 
+        <label class="field" for="recipientNameInput">
+          <span>Recipient Name</span>
+          <input id="recipientNameInput" type="text" maxlength="40" placeholder="Rebecca" />
+        </label>
+
+        <label class="field" for="senderNameInput">
+          <span>Signed By</span>
+          <input id="senderNameInput" type="text" maxlength="40" placeholder="Michael" />
+        </label>
+
         <div class="modal-actions">
+          <button id="shareLinkBtn" class="btn secondary">Share Personalized Link</button>
+          <p id="shareLinkStatus" class="hint" aria-live="polite"></p>
           <button id="saveSettingsBtn" class="btn">Save</button>
           <button id="changePinBtn" class="btn secondary">Set/Change PIN</button>
           <button id="removePinBtn" class="btn secondary">Remove PIN</button>

@@ -1,5 +1,5 @@
 const MESSAGES = [
-  "Mirror, mirror on the wall, Rebecca is the smartest of them all.",
+  "Mirror, mirror on the wall, {name} is the smartest of them all.",
   "You make every challenge feel like an adventure.",
   "You are the most beautiful bunny in the whole Enchanted Forest.",
   "Keep moving forward. You are doing an incredible job.",
@@ -53,6 +53,9 @@ const THEME_MAP = {
 
 const SETTINGS_KEY = "bunny-notes-settings-v1";
 const PIN_KEY = "bunny-notes-pin-v1";
+const PERSONALIZATION_KEY = "bunny-notes-personalization-v1";
+const DEFAULT_RECIPIENT = "Rebecca";
+const DEFAULT_SENDER = "Michael";
 
 const messageText = document.getElementById("messageText");
 const bunnyImage = document.getElementById("bunnyImage");
@@ -80,11 +83,21 @@ const pinInput = document.getElementById("pinInput");
 const pinConfirmInput = document.getElementById("pinConfirmInput");
 const pinError = document.getElementById("pinError");
 const pinSubmitBtn = document.getElementById("pinSubmitBtn");
+const recipientNameInput = document.getElementById("recipientNameInput");
+const senderNameInput = document.getElementById("senderNameInput");
+const signatureToggleLabel = document.getElementById("signatureToggleLabel");
+const shareLinkBtn = document.getElementById("shareLinkBtn");
+const shareLinkStatus = document.getElementById("shareLinkStatus");
 
 let index = Math.floor(Math.random() * MESSAGES.length);
 let deferredPrompt = null;
 let appUnlocked = false;
 let pinMode = "unlock";
+
+const personalization = {
+  recipient: DEFAULT_RECIPIENT,
+  sender: DEFAULT_SENDER
+};
 
 const settings = {
   fontSize: 18,
@@ -121,6 +134,43 @@ function saveSettings() {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
 
+function loadPersonalization() {
+  const params = new URLSearchParams(window.location.search);
+  const toParam = params.get("to");
+  const fromParam = params.get("from");
+
+  if (toParam || fromParam) {
+    personalization.recipient = toParam ? toParam.slice(0, 40) : DEFAULT_RECIPIENT;
+    personalization.sender = fromParam ? fromParam.slice(0, 40) : DEFAULT_SENDER;
+    localStorage.setItem(PERSONALIZATION_KEY, JSON.stringify(personalization));
+    return;
+  }
+
+  try {
+    const parsed = JSON.parse(localStorage.getItem(PERSONALIZATION_KEY) || "{}");
+    if (typeof parsed.recipient === "string" && parsed.recipient.trim()) {
+      personalization.recipient = parsed.recipient.trim();
+    }
+    if (typeof parsed.sender === "string" && parsed.sender.trim()) {
+      personalization.sender = parsed.sender.trim();
+    }
+  } catch {
+    // Keep defaults when storage is unavailable.
+  }
+}
+
+function savePersonalization() {
+  localStorage.setItem(PERSONALIZATION_KEY, JSON.stringify(personalization));
+}
+
+function buildShareUrl() {
+  const url = new URL(window.location.href);
+  url.search = "";
+  url.searchParams.set("to", personalization.recipient);
+  url.searchParams.set("from", personalization.sender);
+  return url.toString();
+}
+
 function applyTheme(themeName) {
   const theme = THEME_MAP[themeName] || THEME_MAP.sunset;
   const root = document.documentElement;
@@ -144,12 +194,17 @@ function applySettingsToUI() {
   themeSelect.value = settings.theme;
   bunnyColorInput.value = settings.bunnyColor;
   bunnyColorToggle.checked = settings.bunnyColorEnabled;
+  recipientNameInput.value = personalization.recipient;
+  senderNameInput.value = personalization.sender;
+  signatureToggleLabel.textContent = `Show signature (- ${personalization.sender})`;
   applyBunnyTint();
 }
 
 function renderMessage() {
-  const signature = settings.showSignature ? " - Michael" : "";
-  messageText.textContent = `${MESSAGES[index]}${signature}`;
+  const template = MESSAGES[index];
+  const withName = template.replace(/\{name\}/g, personalization.recipient);
+  const signature = settings.showSignature ? ` - ${personalization.sender}` : "";
+  messageText.textContent = `${withName}${signature}`;
 }
 
 function nextMessage() {
@@ -278,10 +333,40 @@ saveSettingsBtn.addEventListener("click", () => {
   settings.theme = themeSelect.value;
   settings.bunnyColor = bunnyColorInput.value;
   settings.bunnyColorEnabled = bunnyColorToggle.checked;
+  personalization.recipient = recipientNameInput.value.trim().slice(0, 40) || DEFAULT_RECIPIENT;
+  personalization.sender = senderNameInput.value.trim().slice(0, 40) || DEFAULT_SENDER;
   saveSettings();
+  savePersonalization();
   applySettingsToUI();
   renderMessage();
   closeSettings();
+});
+
+shareLinkBtn.addEventListener("click", async () => {
+  personalization.recipient = recipientNameInput.value.trim().slice(0, 40) || DEFAULT_RECIPIENT;
+  personalization.sender = senderNameInput.value.trim().slice(0, 40) || DEFAULT_SENDER;
+  const shareUrl = buildShareUrl();
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: "Bunny Notes",
+        text: `A Bunny Notes note for ${personalization.recipient}`,
+        url: shareUrl
+      });
+      shareLinkStatus.textContent = "Shared!";
+      return;
+    } catch {
+      // Fall through to clipboard copy if sharing was cancelled or unsupported.
+    }
+  }
+
+  try {
+    await navigator.clipboard.writeText(shareUrl);
+    shareLinkStatus.textContent = "Link copied to clipboard.";
+  } catch {
+    shareLinkStatus.textContent = shareUrl;
+  }
 });
 
 changePinBtn.addEventListener("click", () => {
@@ -359,6 +444,7 @@ if ("serviceWorker" in navigator) {
 }
 
 loadSettings();
+loadPersonalization();
 applySettingsToUI();
 renderMessage();
 randomBunny();
