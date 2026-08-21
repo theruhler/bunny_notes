@@ -56,6 +56,7 @@ const PIN_KEY = "bunny-notes-pin-v1";
 
 const messageText = document.getElementById("messageText");
 const bunnyImage = document.getElementById("bunnyImage");
+const bunnyTint = document.getElementById("bunnyTint");
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
 const shuffleBunnyBtn = document.getElementById("shuffleBunnyBtn");
@@ -65,6 +66,8 @@ const settingsModal = document.getElementById("settingsModal");
 const fontSizeInput = document.getElementById("fontSizeInput");
 const signatureToggle = document.getElementById("signatureToggle");
 const themeSelect = document.getElementById("themeSelect");
+const bunnyColorInput = document.getElementById("bunnyColorInput");
+const bunnyColorToggle = document.getElementById("bunnyColorToggle");
 const saveSettingsBtn = document.getElementById("saveSettingsBtn");
 const closeSettingsBtn = document.getElementById("closeSettingsBtn");
 const changePinBtn = document.getElementById("changePinBtn");
@@ -86,7 +89,9 @@ let pinMode = "unlock";
 const settings = {
   fontSize: 18,
   showSignature: true,
-  theme: "sunset"
+  theme: "sunset",
+  bunnyColor: "#d9a5ff",
+  bunnyColorEnabled: false
 };
 
 function loadSettings() {
@@ -100,6 +105,12 @@ function loadSettings() {
     }
     if (typeof parsed.theme === "string" && THEME_MAP[parsed.theme]) {
       settings.theme = parsed.theme;
+    }
+    if (typeof parsed.bunnyColor === "string" && /^#[0-9a-fA-F]{6}$/.test(parsed.bunnyColor)) {
+      settings.bunnyColor = parsed.bunnyColor;
+    }
+    if (typeof parsed.bunnyColorEnabled === "boolean") {
+      settings.bunnyColorEnabled = parsed.bunnyColorEnabled;
     }
   } catch {
     // Keep defaults when storage is unavailable.
@@ -119,12 +130,21 @@ function applyTheme(themeName) {
   root.style.setProperty("--ink", theme.ink);
 }
 
+function applyBunnyTint() {
+  bunnyTint.style.setProperty("--bunny-color", settings.bunnyColor);
+  bunnyTint.style.setProperty("--bunny-mask-image", `url("${bunnyImage.getAttribute("src")}")`);
+  bunnyTint.classList.toggle("active", settings.bunnyColorEnabled);
+}
+
 function applySettingsToUI() {
   document.documentElement.style.setProperty("--message-font-size", `${settings.fontSize}px`);
   applyTheme(settings.theme);
   fontSizeInput.value = String(settings.fontSize);
   signatureToggle.checked = settings.showSignature;
   themeSelect.value = settings.theme;
+  bunnyColorInput.value = settings.bunnyColor;
+  bunnyColorToggle.checked = settings.bunnyColorEnabled;
+  applyBunnyTint();
 }
 
 function renderMessage() {
@@ -156,6 +176,7 @@ function randomBunny() {
   const options = BUNNY_IMAGES.filter((src) => src !== current);
   const next = options[Math.floor(Math.random() * options.length)] || BUNNY_IMAGES[0];
   bunnyImage.setAttribute("src", next);
+  applyBunnyTint();
 }
 
 function openSettings() {
@@ -255,6 +276,8 @@ saveSettingsBtn.addEventListener("click", () => {
   settings.fontSize = Number(fontSizeInput.value);
   settings.showSignature = signatureToggle.checked;
   settings.theme = themeSelect.value;
+  settings.bunnyColor = bunnyColorInput.value;
+  settings.bunnyColorEnabled = bunnyColorToggle.checked;
   saveSettings();
   applySettingsToUI();
   renderMessage();

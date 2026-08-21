@@ -71,8 +71,14 @@ body {
   gap: 12px;
 }
 
-#bunnyImage {
+.bunny-wrap {
+  position: relative;
   max-width: min(94vw, 420px);
+  width: 100%;
+}
+
+#bunnyImage {
+  display: block;
   width: 100%;
   height: auto;
   -webkit-user-select: none;
@@ -83,6 +89,28 @@ body {
 
 #bunnyImage:active {
   transform: scale(0.985);
+}
+
+.bunny-tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background-color: var(--bunny-color, #d9a5ff);
+  -webkit-mask-image: var(--bunny-mask-image);
+  mask-image: var(--bunny-mask-image);
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  mix-blend-mode: multiply;
+  transition: opacity 180ms ease;
+}
+
+.bunny-tint.active {
+  opacity: 0.65;
 }
 
 #messageText {

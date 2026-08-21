@@ -23,7 +23,10 @@
       </header>
 
       <section class="card" aria-live="polite">
-        <img id="bunnyImage" src="../bunny1.png" alt="Bunny" />
+        <div class="bunny-wrap">
+          <img id="bunnyImage" src="../bunny1.png" alt="Bunny" />
+          <div id="bunnyTint" class="bunny-tint"></div>
+        </div>
         <p id="messageText">Tap for a new note.</p>
       </section>
 
@@ -58,6 +61,16 @@
             <option value="sky">Sky</option>
             <option value="rose">Rose</option>
           </select>
+        </label>
+
+        <label class="field" for="bunnyColorInput">
+          <span>Bunny Color</span>
+          <input id="bunnyColorInput" type="color" value="#d9a5ff" />
+        </label>
+
+        <label class="field checkbox" for="bunnyColorToggle">
+          <input id="bunnyColorToggle" type="checkbox" />
+          <span>Tint the bunny with this color</span>
         </label>
 
         <div class="modal-actions">
